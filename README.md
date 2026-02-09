@@ -2,7 +2,7 @@
 
 ## TODO:
 
-- [ ] Store notes in zustand store
+- [x] Store notes in zustand store
 - [ ] Note component
   - [ ] move note by dragging
   - [ ] change note size by dragging
