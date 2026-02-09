@@ -1,23 +1,32 @@
-import { Button } from "../components/button";
 import { Note } from "../components/Note";
+import { Toolbar } from "../components/Toolbar";
 import { useNotesStore } from "../store/notes.store";
+import type { NoteSize } from "../types";
+import { NOTE_SIZE } from "../utils";
 
 export function Notes() {
-  const { notes, addNote, updateNote, updateNotePosition, clearAllNotes } =
-    useNotesStore();
+  const { notes, addNote, updateNote, updateNotePosition } = useNotesStore();
 
   return (
-    <div className="flex justify-center items-center h-screen w-screen bg-gray-100 p-7">
-      <div className="flex flex-col items-center gap-4">
-        <h1 className="text-2xl font-bold mb-4">Sticky Notes</h1>
-        <Button onClick={() => addNote("new note")}>Add Note</Button>
-        <Button onClick={() => clearAllNotes()}>Clear All Notes</Button>
-      </div>
+    <div
+      className="flex flex-col items-center justify-end h-full w-full pb-16"
+      onDragOver={(e) => e.preventDefault()}
+      onDrop={(e) => {
+        const size = e.dataTransfer.getData("size") as NoteSize;
+        const rect = e.currentTarget.getBoundingClientRect();
+        const pos = {
+          x: e.clientX - rect.left,
+          y: e.clientY - rect.top,
+        };
 
+        addNote(undefined, pos, NOTE_SIZE[size]["px"]);
+      }}
+    >
       {notes.map((note) => (
         <div key={note.id} className="mb-2">
           <Note
             note={note.content}
+            size={note.size}
             position={note.position}
             onUpdate={(content) => updateNote(note.id, content)}
             onUpdatePosition={(position) =>
@@ -26,6 +35,8 @@ export function Notes() {
           />
         </div>
       ))}
+
+      <Toolbar />
     </div>
   );
 }

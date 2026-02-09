@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from "react";
-
+import type { Position, Size } from "../types";
 import { cn } from "../utils";
-import type { Position } from "../types";
 
 type NoteProps = {
   note: string;
+  size: Size;
   position: Position;
   onUpdate: (content: string) => void;
   onUpdatePosition: (position: Position) => void;
@@ -13,26 +13,29 @@ type NoteProps = {
 
 export function Note({
   note,
+  size,
   position,
   onUpdate,
   onUpdatePosition,
   className,
 }: NoteProps) {
-  const [isMoving, setIsMoving] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
   const noteRef = useRef<HTMLDivElement>(null);
   const startPosition = useRef(position);
   const newPosition = useRef(position);
 
-  // Set initial position of the note when it mounts
+  // Set initial position and size of the note when it mounts
   useEffect(() => {
     if (!noteRef.current) return;
     noteRef.current.style.left = `${position.x}px`;
     noteRef.current.style.top = `${position.y}px`;
+    noteRef.current.style.width = `${size.width}px`;
+    noteRef.current.style.height = `${size.height}px`;
   }, []);
 
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!noteRef.current) return;
-    setIsMoving(true);
+    setIsDragging(true);
     const notePosition = noteRef.current.getBoundingClientRect();
     startPosition.current = {
       x: e.clientX - notePosition.left,
@@ -41,13 +44,12 @@ export function Note({
   };
 
   const handleMouseUp = () => {
-    setIsMoving(false);
-    console.log("Updating position:", newPosition.current);
+    setIsDragging(false);
     onUpdatePosition(newPosition.current);
   };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!isMoving || !noteRef.current) return;
+    if (!isDragging || !noteRef.current) return;
     const newX = e.clientX - startPosition.current.x;
     const newY = e.clientY - startPosition.current.y;
     noteRef.current.style.left = `${newX}px`;
@@ -60,7 +62,7 @@ export function Note({
       ref={noteRef}
       className={cn(
         "fixed",
-        "p-4 bg-yellow-500 shadow-md text-gray-900 w-52 h-52",
+        "p-4 bg-yellow-400 shadow-md text-gray-900 w-52 h-52",
         "hover:shadow-xl hover:cursor-grab hover:scale-105",
         "active:cursor-grabbing",
         className,
@@ -73,7 +75,7 @@ export function Note({
       <div
         contentEditable
         suppressContentEditableWarning
-        className="p-4 max-w-52 text-md text-wrap focus:outline-none hover:cursor-pointer hover:bg-yellow-400"
+        className="p-4 max-w-52 text-md text-wrap focus:outline-none focus:bg-yellow-300 hover:cursor-pointer hover:bg-yellow-300"
         onBlur={(e) => {
           if (!e.currentTarget.textContent) return;
           onUpdate(e.currentTarget.textContent);

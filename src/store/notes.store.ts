@@ -2,10 +2,12 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 import type { Note, Position } from "../types";
+import { NOTE_SIZE } from "../utils";
 
 type NotesState = {
   notes: Note[];
-  addNote: (content: string) => void;
+  getNote: (id: string) => Note | undefined;
+  addNote: (content?: string, position?: Position, size?: Note["size"]) => void;
   updateNote: (id: string, content: string) => void;
   updateNotePosition: (id: string, position: Position) => void;
   deleteNote: (id: string) => void;
@@ -14,13 +16,22 @@ type NotesState = {
 
 export const useNotesStore = create<NotesState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       notes: [],
-      addNote: (content) =>
+      getNote: (id) => {
+        const { notes } = get();
+        return notes.find((note) => note.id === id);
+      },
+      addNote: (content, position, size) =>
         set((state) => ({
           notes: [
             ...state.notes,
-            { id: Date.now().toString(), content, position: { x: 0, y: 0 } },
+            {
+              id: Date.now().toString(),
+              content: content || "New note",
+              size: size || NOTE_SIZE["M"]["px"],
+              position: position || { x: 0, y: 0 },
+            },
           ],
         })),
       updateNote: (id, content) =>
