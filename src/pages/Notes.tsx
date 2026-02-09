@@ -15,8 +15,8 @@ export function Notes() {
         const size = e.dataTransfer.getData("size") as NoteSize;
         const rect = e.currentTarget.getBoundingClientRect();
         const pos = {
-          x: e.clientX - rect.left,
-          y: e.clientY - rect.top,
+          x: (e.clientX - rect.left) / window.innerWidth,
+          y: (e.clientY - rect.top) / window.innerHeight,
         };
 
         addNote(undefined, pos, NOTE_SIZE[size ?? "M"]["px"]);

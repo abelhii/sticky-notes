@@ -32,9 +32,13 @@ export function Note({
     if (!dragging.current || !noteRef.current) return;
     const newXPos = e.clientX - startPosition.current.x;
     const newYPos = e.clientY - startPosition.current.y;
+
     noteRef.current.style.left = `${newXPos}px`;
     noteRef.current.style.top = `${newYPos}px`;
-    newPosition.current = { x: newXPos, y: newYPos };
+    newPosition.current = {
+      x: newXPos / window.innerWidth,
+      y: newYPos / window.innerHeight,
+    };
   }, []);
 
   const handlePointerUp = useCallback(() => {
@@ -61,8 +65,11 @@ export function Note({
   // Set initial position and size of the note when it mounts
   useEffect(() => {
     if (!noteRef.current) return;
-    noteRef.current.style.left = `${position.x}px`;
-    noteRef.current.style.top = `${position.y}px`;
+    // Position
+    noteRef.current.style.left = `${position.x * window.innerWidth}px`;
+    noteRef.current.style.top = `${position.y * window.innerHeight}px`;
+
+    // Size
     noteRef.current.style.width = `${size.width}px`;
     noteRef.current.style.height = `${size.height}px`;
 

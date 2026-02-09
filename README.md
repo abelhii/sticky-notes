@@ -25,7 +25,7 @@
   - [x] create note
   - [x] remove all notes
   - [ ] trash zone
-  - [ ] responsive to 1024x768
+  - [x] responsive to 1024x768
 - [x] Notepad
   - [x] create note at specified position
   - [x] create note at specified size
