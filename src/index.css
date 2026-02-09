@@ -1,1 +1,9 @@
 @import "tailwindcss";
+@theme;
+
+.canvas-background {
+  background-image:
+    linear-gradient(theme("colors.gray.200") 0.1em, transparent 0.1em),
+    linear-gradient(90deg, theme("colors.gray.200") 0.1em, transparent 0.1em);
+  background-size: 2em 2em;
+}

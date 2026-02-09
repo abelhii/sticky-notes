@@ -9,7 +9,7 @@ export function Notes() {
 
   return (
     <div
-      className="flex flex-col items-center justify-end h-full w-full pb-16"
+      className="flex flex-col items-center justify-end h-full w-full p-16"
       onDragOver={(e) => e.preventDefault()}
       onDrop={(e) => {
         const size = e.dataTransfer.getData("size") as NoteSize;
