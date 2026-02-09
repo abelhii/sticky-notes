@@ -15,7 +15,6 @@
 - [ ] IV. Different note colors.
 - [ ] V. Saving notes to REST API. Note: you're not required to implement the API, you can mock it, but the mocks should be asynchronous
 
-
 ## Todo
 
 - [x] Store notes in zustand store
@@ -33,8 +32,8 @@
 
 ### Bugs
 
-- [ ] while dragging, when the cursor moves outside of the card dragging stops working. Possible solution is to listen to mousemove on the window instead of the card
-- [ ] onPointer* is used for the ResizeHandle instead of onMouse*, because it interferes with the cards onMouse* events
+- [x] while dragging, when the cursor moves outside of the card dragging stops working. Possible solution is to listen to mousemove on the window instead of the card
+- [x] onPointer* is used for the ResizeHandle instead of onMouse*, because it interferes with the cards onMouse* events
 
 ## Assignment
 

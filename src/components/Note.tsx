@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState, type MouseEvent } from "react";
+import { useCallback, useEffect, useRef, type PointerEvent } from "react";
+
 import type { Position, Size } from "../types";
 import { cn } from "../utils";
 import { ResizeHandle } from "./ResizeHandle";
@@ -22,10 +23,40 @@ export function Note({
   onUpdatePosition,
   className,
 }: NoteProps) {
-  const [isDragging, setIsDragging] = useState(false);
+  const dragging = useRef(false);
   const noteRef = useRef<HTMLDivElement>(null);
   const startPosition = useRef(position);
   const newPosition = useRef(position);
+
+  const handlePointerMove = useCallback((e: globalThis.PointerEvent) => {
+    if (!dragging.current || !noteRef.current) return;
+    const newXPos = e.clientX - startPosition.current.x;
+    const newYPos = e.clientY - startPosition.current.y;
+    noteRef.current.style.left = `${newXPos}px`;
+    noteRef.current.style.top = `${newYPos}px`;
+    newPosition.current = { x: newXPos, y: newYPos };
+  }, []);
+
+  const handlePointerUp = useCallback(() => {
+    onUpdatePosition(newPosition.current);
+
+    // eslint-disable-next-line react-hooks/immutability
+    window.removeEventListener("pointerup", handlePointerUp);
+    window.removeEventListener("pointermove", handlePointerMove);
+  }, []);
+
+  const handlePointerDown = useCallback((e: PointerEvent<HTMLDivElement>) => {
+    if (!noteRef.current) return;
+    dragging.current = true;
+    const notePosition = noteRef.current.getBoundingClientRect();
+    startPosition.current = {
+      x: e.clientX - notePosition.left,
+      y: e.clientY - notePosition.top,
+    };
+
+    window.addEventListener("pointerup", handlePointerUp);
+    window.addEventListener("pointermove", handlePointerMove);
+  }, []);
 
   // Set initial position and size of the note when it mounts
   useEffect(() => {
@@ -34,31 +65,13 @@ export function Note({
     noteRef.current.style.top = `${position.y}px`;
     noteRef.current.style.width = `${size.width}px`;
     noteRef.current.style.height = `${size.height}px`;
-  }, []);
 
-  const handleMouseDown = (e: MouseEvent<HTMLDivElement>) => {
-    if (!noteRef.current) return;
-    setIsDragging(true);
-    const notePosition = noteRef.current.getBoundingClientRect();
-    startPosition.current = {
-      x: e.clientX - notePosition.left,
-      y: e.clientY - notePosition.top,
+    // make sure to remove leftover event listeners on rerender
+    return () => {
+      window.removeEventListener("pointerup", handlePointerUp);
+      window.removeEventListener("pointermove", handlePointerMove);
     };
-  };
-
-  const handleMouseUp = () => {
-    setIsDragging(false);
-    onUpdatePosition(newPosition.current);
-  };
-
-  const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
-    if (!isDragging || !noteRef.current) return;
-    const newXPos = e.clientX - startPosition.current.x;
-    const newYPos = e.clientY - startPosition.current.y;
-    noteRef.current.style.left = `${newXPos}px`;
-    noteRef.current.style.top = `${newYPos}px`;
-    newPosition.current = { x: newXPos, y: newYPos };
-  };
+  }, []);
 
   return (
     <div
@@ -70,10 +83,7 @@ export function Note({
         "active:cursor-grabbing",
         className,
       )}
-      onMouseUp={handleMouseUp}
-      onMouseDown={handleMouseDown}
-      onMouseLeave={handleMouseUp}
-      onMouseMove={handleMouseMove}
+      onPointerDown={handlePointerDown}
     >
       <div
         contentEditable

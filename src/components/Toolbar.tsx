@@ -1,3 +1,4 @@
+import { TbTrash } from "react-icons/tb";
 import { useNotesStore } from "../store/notes.store";
 import { Button } from "./Button";
 import { Notepad } from "./Notepad";
@@ -11,6 +12,7 @@ export function Toolbar() {
       <Notepad size="M" />
       <Notepad size="L" />
       <Button className="bg-red-600" onClick={() => clearAllNotes()}>
+        <TbTrash />
         Clear All
       </Button>
     </div>

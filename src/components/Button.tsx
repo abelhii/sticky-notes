@@ -9,7 +9,7 @@ export function Button({ children, className, ...props }: ButtonProps) {
   return (
     <button
       className={cn(
-        `bg-gray-600 text-white px-4 py-2 rounded`,
+        `flex items-center justify-center gap-2 bg-gray-600 text-white px-4 py-2 rounded`,
         "hover:cursor-pointer hover:scale-105 hover:shadow-lg active:scale-95",
         className,
       )}
