@@ -4,11 +4,15 @@
 
 - [x] Store notes in zustand store
 - [ ] Note component
-  - [ ] move note by dragging
+  - [x] move note by dragging
   - [ ] change note size by dragging
-- [ ] Notes container
-  - [ ] create note
-  - [ ] remove note
+- [x] Notes container
+  - [x] create note
+  - [x] remove all notes
+  - [ ] trash zone
+- [ ] Notepad
+  - [ ] create note at specified position
+  - [ ] create note at specified size
 
 ## Assignment
 
