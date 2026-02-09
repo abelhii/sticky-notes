@@ -1,8 +1,10 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type MouseEvent } from "react";
 import type { Position, Size } from "../types";
 import { cn } from "../utils";
+import { ResizeHandle } from "./ResizeHandle";
 
 type NoteProps = {
+  id: string;
   note: string;
   size: Size;
   position: Position;
@@ -12,6 +14,7 @@ type NoteProps = {
 };
 
 export function Note({
+  id,
   note,
   size,
   position,
@@ -33,7 +36,7 @@ export function Note({
     noteRef.current.style.height = `${size.height}px`;
   }, []);
 
-  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleMouseDown = (e: MouseEvent<HTMLDivElement>) => {
     if (!noteRef.current) return;
     setIsDragging(true);
     const notePosition = noteRef.current.getBoundingClientRect();
@@ -48,34 +51,34 @@ export function Note({
     onUpdatePosition(newPosition.current);
   };
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
     if (!isDragging || !noteRef.current) return;
-    const newX = e.clientX - startPosition.current.x;
-    const newY = e.clientY - startPosition.current.y;
-    noteRef.current.style.left = `${newX}px`;
-    noteRef.current.style.top = `${newY}px`;
-    newPosition.current = { x: newX, y: newY };
+    const newXPos = e.clientX - startPosition.current.x;
+    const newYPos = e.clientY - startPosition.current.y;
+    noteRef.current.style.left = `${newXPos}px`;
+    noteRef.current.style.top = `${newYPos}px`;
+    newPosition.current = { x: newXPos, y: newYPos };
   };
 
   return (
     <div
       ref={noteRef}
       className={cn(
-        "fixed",
+        "absolute",
         "p-4 bg-yellow-400 shadow-md text-gray-900 w-52 h-52",
         "hover:shadow-xl hover:cursor-grab hover:scale-105",
         "active:cursor-grabbing",
         className,
       )}
-      onMouseMove={handleMouseMove}
-      onMouseDown={handleMouseDown}
       onMouseUp={handleMouseUp}
+      onMouseDown={handleMouseDown}
       onMouseLeave={handleMouseUp}
+      onMouseMove={handleMouseMove}
     >
       <div
         contentEditable
         suppressContentEditableWarning
-        className="p-4 max-w-52 text-md text-wrap focus:outline-none focus:bg-yellow-300 hover:cursor-pointer hover:bg-yellow-300"
+        className="p-4 w-full text-md text-wrap focus:outline-none focus:bg-yellow-300 hover:cursor-pointer hover:bg-yellow-300"
         onBlur={(e) => {
           if (!e.currentTarget.textContent) return;
           onUpdate(e.currentTarget.textContent);
@@ -83,6 +86,13 @@ export function Note({
       >
         {note}
       </div>
+
+      <ResizeHandle
+        noteRef={noteRef}
+        noteId={id}
+        size={size}
+        className="absolute bottom-4 right-4"
+      />
     </div>
   );
 }

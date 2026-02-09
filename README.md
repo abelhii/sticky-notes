@@ -3,7 +3,7 @@
 ## Key tasks
 
 - [x] 1. Create a new note of the specified size at the specified position.
-- [ ] 2. Change note size by dragging.
+- [x] 2. Change note size by dragging.
 - [x] 3. Move a note by dragging.
 - [ ] 4. Remove a note by dragging it over a predefined "trash" zone.
 
@@ -21,7 +21,7 @@
 - [x] Store notes in zustand store
 - [ ] Note component
   - [x] move note by dragging
-  - [ ] change note size by dragging
+  - [x] change note size by dragging
 - [x] Notes container
   - [x] create note
   - [x] remove all notes
@@ -30,6 +30,11 @@
 - [x] Notepad
   - [x] create note at specified position
   - [x] create note at specified size
+
+### Bugs
+
+- [ ] while dragging, when the cursor moves outside of the card dragging stops working. Possible solution is to listen to mousemove on the window instead of the card
+- [ ] onPointer* is used for the ResizeHandle instead of onMouse*, because it interferes with the cards onMouse* events
 
 ## Assignment
 

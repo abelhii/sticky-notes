@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-import type { Note, Position } from "../types";
+import type { Note, Position, Size } from "../types";
 import { NOTE_SIZE } from "../utils";
 
 type NotesState = {
@@ -10,6 +10,7 @@ type NotesState = {
   addNote: (content?: string, position?: Position, size?: Note["size"]) => void;
   updateNote: (id: string, content: string) => void;
   updateNotePosition: (id: string, position: Position) => void;
+  updateNoteSize: (id: string, size: Size) => void;
   deleteNote: (id: string) => void;
   clearAllNotes: () => void;
 };
@@ -44,6 +45,12 @@ export const useNotesStore = create<NotesState>()(
         set((state) => ({
           notes: state.notes.map((note) =>
             note.id === id ? { ...note, position } : note,
+          ),
+        })),
+      updateNoteSize: (id, size) =>
+        set((state) => ({
+          notes: state.notes.map((note) =>
+            note.id === id ? { ...note, size } : note,
           ),
         })),
       deleteNote: (id) =>

@@ -19,12 +19,13 @@ export function Notes() {
           y: e.clientY - rect.top,
         };
 
-        addNote(undefined, pos, NOTE_SIZE[size]["px"]);
+        addNote(undefined, pos, NOTE_SIZE[size ?? "M"]["px"]);
       }}
     >
       {notes.map((note) => (
         <div key={note.id} className="mb-2">
           <Note
+            id={note.id}
             note={note.content}
             size={note.size}
             position={note.position}

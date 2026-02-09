@@ -10,7 +10,7 @@ export function Toolbar() {
       <Notepad size="S" />
       <Notepad size="M" />
       <Notepad size="L" />
-      <Button className="bg-red-500" onClick={() => clearAllNotes()}>
+      <Button className="bg-red-600" onClick={() => clearAllNotes()}>
         Clear All
       </Button>
     </div>
