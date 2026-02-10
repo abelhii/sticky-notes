@@ -15,6 +15,10 @@ type NotesState = {
   clearAllNotes: () => void;
 };
 
+const getRelativePos = ({ x, y }: Position): Position => {
+  return { x: x / window.innerWidth, y: y / window.innerHeight };
+};
+
 export const useNotesStore = create<NotesState>()(
   persist(
     (set, get) => ({
@@ -31,7 +35,7 @@ export const useNotesStore = create<NotesState>()(
               id: Date.now().toString(),
               content: content || "New note",
               size: size || NOTE_SIZE["M"]["px"],
-              position: position || { x: 0, y: 0 },
+              position: position ? getRelativePos(position) : { x: 0, y: 0 },
             },
           ],
         })),
@@ -44,7 +48,9 @@ export const useNotesStore = create<NotesState>()(
       updateNotePosition: (id, position) =>
         set((state) => ({
           notes: state.notes.map((note) =>
-            note.id === id ? { ...note, position } : note,
+            note.id === id
+              ? { ...note, position: getRelativePos(position) }
+              : note,
           ),
         })),
       updateNoteSize: (id, size) =>

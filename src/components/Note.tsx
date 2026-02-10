@@ -35,10 +35,7 @@ export function Note({
 
     noteRef.current.style.left = `${newXPos}px`;
     noteRef.current.style.top = `${newYPos}px`;
-    newPosition.current = {
-      x: newXPos / window.innerWidth,
-      y: newYPos / window.innerHeight,
-    };
+    newPosition.current = { x: newXPos, y: newYPos };
   }, []);
 
   const handlePointerUp = useCallback(() => {

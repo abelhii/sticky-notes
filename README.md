@@ -1,5 +1,15 @@
 # Tempo.io take home test
 
+Hi, thanks for taking the time to review my application!
+
+Libraries used:
+
+- **zustand** - for state management and for persisting the notes in local storage
+- **tailwindcss** - for styling
+  - **tailwind-merge** - help with overriding tailwind classes
+  - **clsx** - for constructing classNames conditionally
+- **react-icons**
+
 ## Key tasks
 
 - [x] 1. Create a new note of the specified size at the specified position.
@@ -18,7 +28,7 @@
 ## Todo
 
 - [x] Store notes in zustand store
-- [ ] Note component
+- [x] Note component
   - [x] move note by dragging
   - [x] change note size by dragging
 - [x] Notes container

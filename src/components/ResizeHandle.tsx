@@ -28,7 +28,7 @@ export function ResizeHandle({
 
   const dragging = useRef(false);
   const startPos = useRef({ x: 0, y: 0 });
-  const startSize = useRef({ width: 0, height: 0 });
+  const startSize = useRef(size);
   const newNoteSize = useRef(size);
 
   const handlePointerMove = useCallback((e: globalThis.PointerEvent) => {
@@ -48,6 +48,7 @@ export function ResizeHandle({
 
   const handlePointerUp = useCallback(() => {
     updateNoteSize(noteId, newNoteSize.current);
+    startSize.current = newNoteSize.current;
 
     // eslint-disable-next-line react-hooks/immutability
     window.removeEventListener("pointerup", handlePointerUp);
@@ -60,7 +61,6 @@ export function ResizeHandle({
 
     dragging.current = true;
     startPos.current = { x: e.clientX, y: e.clientY };
-    startSize.current = { ...size };
 
     window.addEventListener("pointerup", handlePointerUp);
     window.addEventListener("pointermove", handlePointerMove);
