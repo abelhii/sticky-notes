@@ -13,6 +13,7 @@ type NotesState = {
   updateNoteSize: (id: string, size: Size) => void;
   deleteNote: (id: string) => void;
   clearAllNotes: () => void;
+  updateNoteRect: (id: string, rect?: DOMRect) => void;
 };
 
 const getRelativePos = ({ x, y }: Position): Position => {
@@ -57,6 +58,12 @@ export const useNotesStore = create<NotesState>()(
         set((state) => ({
           notes: state.notes.map((note) =>
             note.id === id ? { ...note, size } : note,
+          ),
+        })),
+      updateNoteRect: (id, rect) =>
+        set((state) => ({
+          notes: state.notes.map((note) =>
+            note.id === id ? { ...note, rect } : note,
           ),
         })),
       deleteNote: (id) =>

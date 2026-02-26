@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, type PointerEvent } from "react";
 import type { Position, Size } from "../types";
 import { cn } from "../utils";
 import { ResizeHandle } from "./ResizeHandle";
+import { useNotesStore } from "../store/notes.store";
 
 type NoteProps = {
   id: string;
@@ -11,6 +12,7 @@ type NoteProps = {
   position: Position;
   onUpdate: (content: string) => void;
   onUpdatePosition: (position: Position) => void;
+  onUpdateCurrentNoteId: (id: string | null) => void;
   className?: string;
 };
 
@@ -21,8 +23,10 @@ export function Note({
   position,
   onUpdate,
   onUpdatePosition,
+  onUpdateCurrentNoteId,
   className,
 }: NoteProps) {
+  const { updateNoteRect } = useNotesStore();
   const dragging = useRef(false);
   const noteRef = useRef<HTMLDivElement>(null);
   const startPosition = useRef(position);
@@ -36,13 +40,15 @@ export function Note({
     noteRef.current.style.left = `${newXPos}px`;
     noteRef.current.style.top = `${newYPos}px`;
     newPosition.current = { x: newXPos, y: newYPos };
+    updateNoteRect(id, noteRef.current?.getBoundingClientRect());
   }, []);
 
   const handlePointerUp = useCallback(() => {
     onUpdatePosition(newPosition.current);
+    onUpdateCurrentNoteId(null);
 
     // eslint-disable-next-line react-hooks/immutability
-    window.removeEventListener("pointerup", handlePointerUp);
+    window.removeEventListener("mouseup", handlePointerUp);
     window.removeEventListener("pointermove", handlePointerMove);
   }, []);
 
@@ -55,7 +61,9 @@ export function Note({
       y: e.clientY - notePosition.top,
     };
 
-    window.addEventListener("pointerup", handlePointerUp);
+    onUpdateCurrentNoteId(id);
+
+    window.addEventListener("mouseup", handlePointerUp);
     window.addEventListener("pointermove", handlePointerMove);
   }, []);
 
