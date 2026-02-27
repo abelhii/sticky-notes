@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useRef, type PointerEvent } from "react";
+import { useEffect, useRef, type PointerEvent } from "react";
 
+import { useNotesStore } from "../store/notes.store";
 import type { Position, Size } from "../types";
 import { cn } from "../utils";
 import { ResizeHandle } from "./ResizeHandle";
@@ -11,6 +12,7 @@ type NoteProps = {
   position: Position;
   onUpdate: (content: string) => void;
   onUpdatePosition: (position: Position) => void;
+  onUpdateCurrentNoteId: (id: string | null) => void;
   className?: string;
 };
 
@@ -21,14 +23,19 @@ export function Note({
   position,
   onUpdate,
   onUpdatePosition,
+  onUpdateCurrentNoteId,
   className,
 }: NoteProps) {
+  const { updateNoteRect } = useNotesStore();
   const dragging = useRef(false);
   const noteRef = useRef<HTMLDivElement>(null);
   const startPosition = useRef(position);
   const newPosition = useRef(position);
 
-  const handlePointerMove = useCallback((e: globalThis.PointerEvent) => {
+  const controller = new AbortController();
+  const signal = controller.signal;
+
+  const handlePointerMove = (e: globalThis.PointerEvent) => {
     if (!dragging.current || !noteRef.current) return;
     const newXPos = e.clientX - startPosition.current.x;
     const newYPos = e.clientY - startPosition.current.y;
@@ -36,17 +43,17 @@ export function Note({
     noteRef.current.style.left = `${newXPos}px`;
     noteRef.current.style.top = `${newYPos}px`;
     newPosition.current = { x: newXPos, y: newYPos };
-  }, []);
+    updateNoteRect(id, noteRef.current?.getBoundingClientRect());
+  };
 
-  const handlePointerUp = useCallback(() => {
+  const handlePointerUp = () => {
     onUpdatePosition(newPosition.current);
+    onUpdateCurrentNoteId(null);
 
-    // eslint-disable-next-line react-hooks/immutability
-    window.removeEventListener("pointerup", handlePointerUp);
-    window.removeEventListener("pointermove", handlePointerMove);
-  }, []);
+    controller.abort();
+  };
 
-  const handlePointerDown = useCallback((e: PointerEvent<HTMLDivElement>) => {
+  const handlePointerDown = (e: PointerEvent<HTMLDivElement>) => {
     if (!noteRef.current) return;
     dragging.current = true;
     const notePosition = noteRef.current.getBoundingClientRect();
@@ -55,9 +62,11 @@ export function Note({
       y: e.clientY - notePosition.top,
     };
 
-    window.addEventListener("pointerup", handlePointerUp);
-    window.addEventListener("pointermove", handlePointerMove);
-  }, []);
+    onUpdateCurrentNoteId(id);
+
+    window.addEventListener("mouseup", handlePointerUp, { signal });
+    window.addEventListener("pointermove", handlePointerMove, { signal });
+  };
 
   // Set initial position and size of the note when it mounts
   useEffect(() => {
@@ -72,8 +81,7 @@ export function Note({
 
     // make sure to remove leftover event listeners on rerender
     return () => {
-      window.removeEventListener("pointerup", handlePointerUp);
-      window.removeEventListener("pointermove", handlePointerMove);
+      controller.abort();
     };
   }, []);
 

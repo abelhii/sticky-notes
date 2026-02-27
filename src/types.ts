@@ -8,4 +8,5 @@ export type Note = {
   content: string;
   size: Size;
   position: Position;
+  rect?: DOMRect;
 };
