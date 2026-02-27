@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback, useEffect } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Note } from "../components/Note";
 import { Toolbar } from "../components/Toolbar";
 import { TrashZone } from "../components/TrashZone";
@@ -24,7 +24,6 @@ export function Notes() {
   const { deleteNote, getNote } = useNotesStore();
 
   const handlePointerUp = useCallback(() => {
-    console.log("pointer up", currentNoteId, isIntersecting);
     if (!currentNoteId || !isIntersecting) return;
     deleteNote(currentNoteId);
     setIsIntersecting(false);
@@ -37,22 +36,18 @@ export function Notes() {
     if (!note || !note.rect) return;
     const zoneRect = trashZone.current.getBoundingClientRect();
 
-    if (intersectRect(zoneRect, note.rect)) {
-      setIsIntersecting(true);
-    } else {
-      setIsIntersecting(false);
-    }
-
-    console.log(intersectRect(zoneRect, note.rect));
+    if (intersectRect(zoneRect, note.rect)) setIsIntersecting(true);
+    else setIsIntersecting(false);
   }, [currentNoteId, getNote]);
 
   useEffect(() => {
-    window.addEventListener("pointermove", handlePointerMove);
-    window.addEventListener("pointerup", handlePointerUp);
+    const controller = new AbortController();
+    const signal = controller.signal;
+    window.addEventListener("pointermove", handlePointerMove, { signal });
+    window.addEventListener("pointerup", handlePointerUp, { signal });
 
     return () => {
-      window.removeEventListener("pointermove", handlePointerMove);
-      window.removeEventListener("pointerup", handlePointerUp);
+      controller.abort();
     };
   }, [handlePointerMove, handlePointerUp]);
 
@@ -87,7 +82,7 @@ export function Notes() {
         </div>
       ))}
 
-      <TrashZone ref={trashZone} />
+      <TrashZone ref={trashZone} isNoteOver={isIntersecting} />
 
       <Toolbar />
     </div>

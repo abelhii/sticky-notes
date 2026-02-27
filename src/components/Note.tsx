@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useRef, type PointerEvent } from "react";
+import { useEffect, useRef, type PointerEvent } from "react";
 
+import { useNotesStore } from "../store/notes.store";
 import type { Position, Size } from "../types";
 import { cn } from "../utils";
 import { ResizeHandle } from "./ResizeHandle";
-import { useNotesStore } from "../store/notes.store";
 
 type NoteProps = {
   id: string;
@@ -32,7 +32,10 @@ export function Note({
   const startPosition = useRef(position);
   const newPosition = useRef(position);
 
-  const handlePointerMove = useCallback((e: globalThis.PointerEvent) => {
+  const controller = new AbortController();
+  const signal = controller.signal;
+
+  const handlePointerMove = (e: globalThis.PointerEvent) => {
     if (!dragging.current || !noteRef.current) return;
     const newXPos = e.clientX - startPosition.current.x;
     const newYPos = e.clientY - startPosition.current.y;
@@ -41,18 +44,16 @@ export function Note({
     noteRef.current.style.top = `${newYPos}px`;
     newPosition.current = { x: newXPos, y: newYPos };
     updateNoteRect(id, noteRef.current?.getBoundingClientRect());
-  }, []);
+  };
 
-  const handlePointerUp = useCallback(() => {
+  const handlePointerUp = () => {
     onUpdatePosition(newPosition.current);
     onUpdateCurrentNoteId(null);
 
-    // eslint-disable-next-line react-hooks/immutability
-    window.removeEventListener("mouseup", handlePointerUp);
-    window.removeEventListener("pointermove", handlePointerMove);
-  }, []);
+    controller.abort();
+  };
 
-  const handlePointerDown = useCallback((e: PointerEvent<HTMLDivElement>) => {
+  const handlePointerDown = (e: PointerEvent<HTMLDivElement>) => {
     if (!noteRef.current) return;
     dragging.current = true;
     const notePosition = noteRef.current.getBoundingClientRect();
@@ -63,9 +64,9 @@ export function Note({
 
     onUpdateCurrentNoteId(id);
 
-    window.addEventListener("mouseup", handlePointerUp);
-    window.addEventListener("pointermove", handlePointerMove);
-  }, []);
+    window.addEventListener("mouseup", handlePointerUp, { signal });
+    window.addEventListener("pointermove", handlePointerMove, { signal });
+  };
 
   // Set initial position and size of the note when it mounts
   useEffect(() => {
@@ -80,8 +81,7 @@ export function Note({
 
     // make sure to remove leftover event listeners on rerender
     return () => {
-      window.removeEventListener("pointerup", handlePointerUp);
-      window.removeEventListener("pointermove", handlePointerMove);
+      controller.abort();
     };
   }, []);
 
